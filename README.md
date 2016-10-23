@@ -26,5 +26,13 @@ Table 1 : Comparison of accuracy for various classification methods
 ![alt text](/Assets/Image_results.png "Classification results on both dataset. Only 16 non-zero labels are tested")
 
 # Implementation
-Data preparation : Matlab (Mat file)
-CNN classification : Theano + Lasagne+ Nolearn
+1) Data preparation : Matlab (Mat file)
+-Download data mat file and place them in /Matlab-Sat-Data/data/
+-Then run /Matlab-Sat-Data/script_prep_data.m
+
+2) CNN classification : Theano + Lasagne+ Nolearn
+-Run train.py for training and testing accuracy
+
+
+For PCA, this matlab file exchange implementation was used:
+https://jp.mathworks.com/matlabcentral/fileexchange/38300-pca-and-ica-package/content/pca_ica/myPCA.m
