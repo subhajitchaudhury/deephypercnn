@@ -23,7 +23,7 @@ Table 1 : Comparison of accuracy for various classification methods
 | Pavia University 	|         10        	|  93.94  	|  99.62  	|  99.66  	|
 
 
-![alt text](/assets/Image_results.png "Classification results on both dataset. Only 16 non-zero labels are tested")
+![alt text](/Assets/Image_results.png "Classification results on both dataset. Only 16 non-zero labels are tested")
 
 # Implementation
 Data preparation : Matlab (Mat file)
