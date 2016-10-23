@@ -27,7 +27,8 @@ Table 1 : Comparison of accuracy for various classification methods
 
 # Implementation
 1) Data preparation : Matlab (Mat file)
--Download data mat file and place them in /Matlab-Sat-Data/data/
+-Download publicly available data mat files from following link and place them in /Matlab-Sat-Data/data/
+http://www.ehu.eus/ccwintco/index.php?title=Hyperspectral_Remote_Sensing_Scenes
 -Then run /Matlab-Sat-Data/script_prep_data.m
 
 2) CNN classification : Theano + Lasagne+ Nolearn
