@@ -13,8 +13,10 @@ from lasagne.nonlinearities import softmax
 from nolearn.lasagne import TrainSplit 
 from prepData import load_matfile
 import sys
+import matplotlib.pyplot as plt
+from numpy.random import shuffle
 sys.setrecursionlimit(1500)
-
+cr=30
 
 class AdjustVariable(object):
     def __init__(self, name, start=0.03, stop=0.001):
@@ -84,7 +86,6 @@ class EarlyStopping(object):
         
 def network():
     
-    cr=30;
     net = NeuralNet(
     layers=[
         ('input', layers.InputLayer),
@@ -113,55 +114,157 @@ def network():
     on_epoch_finished=[
         AdjustVariable('update_learning_rate', start=0.005, stop=0.005),
         #AdjustVariable('update_momentum', start=0.9, stop=0.999),
-        EarlyStopping(patience=200),
+        EarlyStopping(patience=40),
         ],
     train_split=TrainSplit(eval_size=0.1), 
     batch_iterator_train=FlipBatchIterator(batch_size=512),
-    max_epochs=2000,
+    max_epochs=500,
     verbose=2,
     )
     return net
+
+def predict_im(X,gt,net,mean,std):
+    print 'Predicting image'
+    h,w,ch=X.shape
+    y_pred=np.zeros((h,w),dtype='uint8')
+    conv_filter_size=5;
+    b_size=(conv_filter_size-1)/2
+    reflect = cv2.copyMakeBorder(X,b_size,b_size,b_size,b_size,cv2.BORDER_REFLECT)
     
+    for y in range(h):
+        print 'Y=',y
+        for x in range(w):
+            patch_i=reflect[y:y+conv_filter_size,y:y+conv_filter_size,:]
+            patch_i=patch_i.transpose(2,0,1)
+            patch_i=(patch_i[None,:]-mean)/std
+            
+            print patch_i.shape
+            
+            y_pred[y,x]=net.predict(patch_i)
     
-def train_network(X,y,prefix):
+    return y_pred            
+            
+    
+def train_network(X,y,prefix,mean,std):
     net=network()
     net.fit(X, y)
     # Save models.
-    f = open(prefix+"_indian_pines.dump", "wb")
-    cPickle.dump(net, f, -1)
+    f = open(prefix+".dump", "wb")
+    cPickle.dump((net,mean,std), f, -1)
     f.close()
     
     return net
     
+def plot_predict_gt(y_pred,y_true,filename='./results/pines'):
+    f, axarr = plt.subplots(2)
     
-if __name__=='__main__':
-    X,y=load_matfile(filename='./data/indian_pines_data_pca.mat')
-    #X,y=load_matfile(filename='./data/indian_pines_data.mat')
-    X=X.transpose(3,2,1,0)
-    y=np.squeeze(y)-1
+    print y_true.shape
+    axarr[0].imshow(y_pred.astype('uint8'))
+    axarr[0].set_title('Predicted label')
     
+    axarr[1].imshow(y_true.astype('uint8'))
+    axarr[1].set_title('True label')
+    
+    plt.imsave(filename+'_gt.png',y_true)
+    plt.imsave(filename+'_pred.png',y_pred)
+    
+def train_pines(is_train=True):
+    X,y,gt=load_matfile(filename='./data/Indian_pines_pca.mat')
     num_pix=len(X)
+    
+    #shuffle idx
+    idx=np.asarray(range(num_pix),dtype='uint')
+    shuffle(idx)
+    
     train_size=np.round(0.8*num_pix)
+
+    X_train=X[idx[:train_size]].astype('float32')
+    y_train=y[idx[:train_size]]
     
-    X_train=X[:train_size]
-    y_train=y[:train_size]
+    X_test=X[idx[train_size:]].astype('float32')
+    y_test=y[idx[train_size:]]
     
-    X_test=X[train_size:]
-    y_test=y[train_size:]
-    
+    if is_train:
+        std=np.std(X_train)
+        mean=np.mean(X_train)
+        X_train=(X_train-mean)/std    
+        prefix='./model/classify_pines'
+        net=train_network(X_train,y_train,prefix,mean,std)
+    else:
+        f = open('./model/classify_pines.dump', 'rb')
+        net,mean,std=cPickle.load(f)
+        f.close()
         
-    
-    std=np.std(X_train)
-    mean=np.mean(X_train)
-    
-    X_train=(X_train-mean)/std    
     X_test=(X_test-mean)/std    
-    
-    
-    prefix='test2'
-    net=train_network(X_train,y_train,prefix)
-    
     y_pred=net.predict(X_test)
     acc=np.sum(y_pred==y_test)*1.0/len(y_test)
-    
     print 'Test Accuracy= ',acc*100,' %'
+    
+    print gt.shape
+    y_array=np.zeros(gt.shape,dtype='uint8')
+    y_array[gt!=0]=net.predict((X-mean)/std)+1
+    #y_array=predict_im(im,gt,net,mean,std)
+    plot_predict_gt(y_array,gt,filename='./results/pines')
+    
+    return net,y_pred
+
+def train_pavia(is_train=True):
+    X,y,gt=load_matfile(filename='./data/Pavia_U_pca.mat')
+    num_pix=len(X)
+    
+    #shuffle idx
+    idx=np.asarray(range(num_pix),dtype='uint')
+    shuffle(idx)
+    
+    train_size=np.round(0.8*num_pix)
+
+    X_train=X[idx[:train_size]].astype('float32')
+    y_train=y[idx[:train_size]]
+    
+    X_test=X[idx[train_size:]].astype('float32')
+    y_test=y[idx[train_size:]]
+    
+    
+    if is_train:
+        std=np.std(X_train)
+        mean=np.mean(X_train)
+        X_train=(X_train-mean)/std    
+        prefix='./model/classify_pavia_U'
+        net=train_network(X_train,y_train,prefix,mean,std)
+    else:
+        f = open('./model/classify_pavia_U.dump', 'rb')
+        net,mean,std=cPickle.load(f)
+        f.close()
+    
+    
+    X_test=(X_test-mean)/std    
+    y_pred=net.predict(X_test)
+    acc=np.sum(y_pred==y_test)*1.0/len(y_test)
+    print 'Test Accuracy= ',acc*100,' %'
+    
+    
+   
+    y_array=np.zeros(gt.shape,dtype='uint8')
+    y_array[gt!=0]=net.predict((X-mean)/std)+1
+    plot_predict_gt(y_array,gt,filename='./results/pavia')
+    
+    return net,y_pred
+
+
+if __name__=='__main__':
+    cr=30
+    net1,y_pred1=train_pines(False)
+    cr=10
+    net2,y_pred2=train_pavia(False)
+    
+#    net,y_pred_lab=train()    
+#    X,y=load_matfile(filename='./data/indian_pines_data_pca_all.mat')
+#    X_all=X.transpose(3,2,1,0)
+#    y_all=np.squeeze(y)
+#    
+#    #read the labels where not 0    
+#    idx=(y_all!=0)
+#    y_pred=np.zeros(y_all.shape)
+#    y_pred[idx]=y_pred_lab
+#    
+#    plot_predict_gt(y_pred+1,y_all)

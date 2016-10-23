@@ -18,11 +18,18 @@ def load_matfile(filename='./data/indian_pines_data.mat'):
     else:
         X=np.asarray(f['X'],dtype='float32')
     y=np.asarray(f['labels'],dtype='uint8')
+    gt=np.asarray(f['ip_gt'],dtype='uint8')
+    #im=np.asarray(f['im'],dtype='uint8')
     f.close()
-    return X,y
+    
+    X=X.transpose(3,2,1,0)
+    y=np.squeeze(y)-1
+    gt=gt.transpose(1,0)
+    #im=im.transpose(2,1,0)
+    return X,y,gt
     
 
 
 if __name__=='__main__':
-    X,y=load_matfile(filename='./data/indian_pines_data_pca.mat')
+    X,y,gt,im=load_matfile(filename='./data/Indian_pines_pca.mat')
     
