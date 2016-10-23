@@ -5,9 +5,12 @@ Classification of Hyperspectral Satellite Image Using Deep Convolutional Neural 
 
 # Method details
 1) For each non-zero labelled pixel, we extract 5 x 5 x c neighbourhood and corresponding label.
+
 2) Dimensionality reduction using PCA is performed. Final dimension is 5 x 5 x cr.
+
 3) Training using CNN is performed with the following architecture:
   conv1-conv2-conv3-conv4-hidden1-hidden2-16way-softmax
+  
 4) Training : testing split ratio is maintained at 0.8:0.2
 
 # Results
