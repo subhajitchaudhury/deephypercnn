@@ -11,7 +11,7 @@ Classification of Hyperspectral Satellite Image Using Deep Convolutional Neural 
 3) Training using CNN is performed with the following architecture:
   conv1-conv2-conv3-conv4-hidden1-hidden2-16way-softmax
   
-4) Training : testing split ratio is maintained at 0.8:0.2
+4) Training : testing split ratio is maintained at 0.8 : 0.2
 
 # Results
 
