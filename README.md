@@ -43,3 +43,6 @@ http://www.ehu.eus/ccwintco/index.php?title=Hyperspectral_Remote_Sensing_Scenes
 
 For PCA, this matlab file exchange implementation was used:
 https://jp.mathworks.com/matlabcentral/fileexchange/38300-pca-and-ica-package/content/pca_ica/myPCA.m
+
+MIT License
+Copyright (c) 2016 Subhajit Chaudhury
