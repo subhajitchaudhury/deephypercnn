@@ -1,5 +1,5 @@
 # deephypercnn
-Classification of Hyperspectral Satellite Image Using Deep Convolutional Neural Networks. This is implementation of the paper 
+Classification of Hyperspectral Satellite Image Using Deep Convolutional Neural Networks. This is re-implementation of the paper 
 
 [1] K. Makantasis, K. Karantzalos, A. Doulamis and N. Doulamis, "Deep supervised learning for hyperspectral data classification through convolutional neural networks," 2015 IEEE International Geoscience and Remote Sensing Symposium (IGARSS), Milan, 2015, pp. 4959-4962.
 
